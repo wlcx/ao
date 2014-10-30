@@ -4,11 +4,6 @@ Package ao defines bindings for [libao][ao].
 Libao is a cross-platform audio library that allows programs to output audio
 using a simple API on a wide variety of platforms.
 
-This library can be used by itself, or in combination with [ffmpeg] for
-advanced decoding options.
-
-[ffmpeg]: https://github.com/jteeuwen/ffmpeg
-
 
 ### Supported platforms
 
