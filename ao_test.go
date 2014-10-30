@@ -14,7 +14,21 @@ const (
 	//file = "testdata/test.wav"
 )
 
-const driverName = "null" // null = special driver for testing.
+const driverName = "null" // special driver for testing.
+
+var (
+	options = map[string]string{
+		"debug":   "",
+		"verbose": "",
+	}
+
+	format = &SampleFormat{
+		ByteOrder: EndianNative,
+		Bits:      16,
+		Rate:      44100,
+		Channels:  2,
+	}
+)
 
 func Test(t *testing.T) {
 	Init()
@@ -26,20 +40,7 @@ func Test(t *testing.T) {
 		return
 	}
 
-	options := map[string]string{
-		"debug": "",
-		"dev":   "hw:0",
-	}
-
-	sf := &SampleFormat{
-		Matrix:    MatrixDefault,
-		ByteOrder: EndianNative,
-		Bits:      16,
-		Rate:      44100,
-		Channels:  2,
-	}
-
-	dev, err := OpenLive(driver, sf, options)
+	dev, err := OpenLive(driver, format, options)
 	if err != nil {
 		t.Error(err)
 		return

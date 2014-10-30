@@ -74,13 +74,21 @@ type SampleFormat struct {
 
 // toC converts the sample format to its C equivalent.
 func (sf *SampleFormat) toC() *C.ao_sample_format {
-	return &C.ao_sample_format{
+	csf := &C.ao_sample_format{
 		bits:        C.int(sf.Bits),
 		rate:        C.int(sf.Rate),
 		channels:    C.int(sf.Channels),
 		byte_format: C.int(sf.ByteOrder),
 		matrix:      C.CString(sf.Matrix),
 	}
+
+	// Matrix should be explicitely set to NULL if the string is empty.
+	// A zero-length string is not considered valid.
+	if len(sf.Matrix) == 0 {
+		csf.matrix = nil
+	}
+
+	return csf
 }
 
 // Common examples of channel orderings.
