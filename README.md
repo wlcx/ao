@@ -1,5 +1,7 @@
 ## ao
 
+[![GoDoc](https://godoc.org/github.com/jteeuwen/ao?status.png)](https://godoc.org/github.com/jteeuwen/ao)
+
 Package ao defines bindings for [libao](https://xiph.org/ao).
 Libao is a cross-platform audio library that allows programs to output audio
 using a simple API on a wide variety of platforms.
