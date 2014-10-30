@@ -19,7 +19,10 @@ import (
 var libInitialized uint32
 
 // Init must be called before anything else in this package.
-// It initialises the ao librry. This call should be balanced with Shutdown().
+//
+// This loads the plugins from disk, reads the libao configuration files,
+// and identifies an appropriate default output driver if none is specified
+// in the configuration files.
 func Init() {
 	if atomic.CompareAndSwapUint32(&libInitialized, 0, 1) {
 		C.ao_initialize()
@@ -34,13 +37,15 @@ func Shutdown() {
 }
 
 // DefaultDriver returns the ID number of the default live output driver.
-// If the configuration files specify a default driver, its ID is returned,
-// otherwise the library tries to pick a live output driver that will work
+// If the configuration files specify a default driver, its ID is returned.
+// Otherwise the library tries to pick a live output driver that will work
 // on the host platform.
 //
-// A negative return value indicates failure to locate a suitable driver.
 // If no default device is available, you may still use the NULL device
 // for testing porpuses.
+//
+// If no audio hardware is available, it is in use, or is not in the "standard"
+// configuration, this returns -1.
 func DefaultDriver() int { return int(C.ao_default_driver_id()) }
 
 // DriverByName attempts to fetch the id for the given driver.
