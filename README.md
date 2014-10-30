@@ -1,6 +1,6 @@
 ## ao
 
-Package ao defines bindings for [libao][ao].
+Package ao defines bindings for [libao](https://xiph.org/ao).
 Libao is a cross-platform audio library that allows programs to output audio
 using a simple API on a wide variety of platforms.
 
