@@ -4,17 +4,13 @@
 package ao
 
 import (
-	"fmt"
+	"crypto/rand"
 	"testing"
 )
 
-const (
-	//file = "testdata/test.mp3"
-	file = "testdata/test.opus"
-	//file = "testdata/test.wav"
-)
-
-const driverName = "null" // special driver for testing.
+// null is a special driver for testing.
+// It does not generate actual sound.
+const driverName = "null"
 
 var (
 	options = map[string]string{
@@ -48,5 +44,18 @@ func Test(t *testing.T) {
 
 	defer dev.Close()
 
-	fmt.Println(dev)
+	var buf [16 * 1024]byte
+	for i := 0; i < 32; i++ {
+		n, err := rand.Read(buf[:])
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		err = dev.Play(buf[:n])
+		if err != nil {
+			t.Error(err)
+			return
+		}
+	}
 }

@@ -6,6 +6,7 @@ package ao
 // #include <ao/ao.h>
 import "C"
 import (
+	"errors"
 	"unsafe"
 )
 
@@ -14,13 +15,48 @@ type Device struct {
 	ptr *C.ao_device
 }
 
-// Close closes the device after use.
+// Play plays a block of audio data to an open device. Samples are interleaved
+// by channels (Time 1, Channel 1; Time 1, Channel 2; Time 2, Channel 1; etc.)
+// in the memory buffer.
+//
+// Returns an error if playback failed. In which case, the device should
+// be closed.
+func (d *Device) Play(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
+	if d.ptr == nil {
+		return errors.New("device is closed")
+	}
+
+	if C.ao_play(
+		d.ptr,
+		(*C.char)(unsafe.Pointer(&data[0])),
+		C.uint_32(len(data)),
+	) == 0 {
+		return errors.New("playback failed; device should be closed")
+	}
+
+	return nil
+}
+
+// Close closes the audio device and frees the memory allocated
+// by the device structure.
+//
+// An error is returned if closing of the device failed.
+// If this device was writing to a file, the file may be corrupted.
 func (d *Device) Close() error {
+	var err error
+
 	if d.ptr != nil {
-		C.ao_close(d.ptr)
+		if C.ao_close(d.ptr) <= 0 {
+			err = errors.New("failed to close device correctly")
+		}
 		d.ptr = nil
 	}
-	return nil
+
+	return err
 }
 
 // OpenFile open a file for audio output. The file format is determined by
