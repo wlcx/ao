@@ -28,7 +28,7 @@ using a simple API on a wide variety of platforms.
 * OpenBSD's sndio
 
 
-### Usage
+### Install
 
     go get github.com/jteeuwen/ao
 
