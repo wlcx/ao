@@ -69,7 +69,12 @@ type SampleFormat struct {
 	Bits      int       // Bits per sample.
 	Rate      int       // Samples per second per channel.
 	Channels  int       // Number of audio channels.
-	ByteOrder ByteOrder // Byte ordering of the sample data.
+	ByteOrder ByteOrder // Byte ordering of the sample data. Defaults to EndianNative
+}
+
+// Bitrate computes the bitrate for a given sample in bits per second.
+func (sf *SampleFormat) Bitrate() int {
+	return sf.Rate * sf.Bits * sf.Channels
 }
 
 // toC converts the sample format to its C equivalent.
@@ -86,6 +91,10 @@ func (sf *SampleFormat) toC() *C.ao_sample_format {
 	// A zero-length string is not considered valid.
 	if len(sf.Matrix) == 0 {
 		csf.matrix = nil
+	}
+
+	if csf.byte_format == 0 {
+		csf.byte_format = C.AO_FMT_NATIVE
 	}
 
 	return csf
