@@ -72,7 +72,8 @@ type SampleFormat struct {
 	ByteOrder ByteOrder // Byte ordering of the sample data. Defaults to EndianNative
 }
 
-// Bitrate computes the bitrate for a given sample in bits per second.
+// Bitrate computes the bitrate in bits per second, given the current
+// sample format settings.
 func (sf *SampleFormat) Bitrate() int {
 	return sf.Rate * sf.Bits * sf.Channels
 }
