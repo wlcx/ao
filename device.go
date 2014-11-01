@@ -15,6 +15,17 @@ type Device struct {
 	ptr *C.ao_device
 }
 
+// PlayU16 is the same as Play() but accepts a slice of 16 bit PCM sample data.
+// This function assumes the sample format byte order is set to EndianNative.
+func (d *Device) PlayU16(data []uint16) error {
+	sz := len(data)
+	if sz == 0 {
+		return nil
+	}
+
+	return d.Play((*(*[1<<31 - 1]byte)(unsafe.Pointer(&data[0])))[:sz*2])
+}
+
 // Play plays a block of audio data to an open device. Samples are interleaved
 // by channels (Time 1, Channel 1; Time 1, Channel 2; Time 2, Channel 1; etc.)
 // in the memory buffer.
