@@ -36,7 +36,6 @@ func main() {
 
 	// Initialize libao.
 	ao.Init()
-	defer ao.Shutdown()
 
 	// Get the requested- or system's default audio driver.
 	var id int
@@ -48,6 +47,7 @@ func main() {
 
 	if id == -1 {
 		fmt.Fprintln(os.Stderr, "no valid audio driver found")
+		ao.Shutdown()
 		os.Exit(1)
 	}
 
@@ -55,12 +55,14 @@ func main() {
 	device, err := ao.OpenLive(id, &sf, nil)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "open audio device:", err)
+		ao.Shutdown()
 		os.Exit(1)
 	}
 
 	// Play the samples.
 	device.PlayU16(morsecode)
 	device.Close()
+	ao.Shutdown()
 }
 
 // parseArgs processes all command line arguments and ensures there
