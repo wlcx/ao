@@ -18,7 +18,7 @@ Any unknown character is reported through stderr and is otherwise ignored.
 
 	$ morse [options] <sentence>
 
-To hear the morse code for a sentance using default sample format:
+To hear the morse code for a sentence using default sample format:
 
 	$ morse "some test string"
 
