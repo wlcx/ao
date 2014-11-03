@@ -78,7 +78,6 @@ func parseArgs(sf *ao.SampleFormat, cfg *Config) string {
 	sf.Rate = 8000
 	sf.Channels = 2
 
-	flag.IntVar(&sf.Bits, "b", sf.Bits, "Number of bits per sample.")
 	flag.IntVar(&sf.Rate, "r", sf.Rate, "Number of samples per second per channel.")
 	flag.IntVar(&sf.Channels, "c", sf.Channels, "Number of channels.")
 	flag.StringVar(&sf.Matrix, "m", sf.Matrix, "Channel matrix for audio driver.")
