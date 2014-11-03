@@ -18,7 +18,7 @@ type SampleSet struct {
 
 // MakeSamples creates some raw, 16-bit PCM audio samples for morse code sounds.
 // These are the building blocks for all morse code characters.
-func MakeSamples(rate, channels int, unit, frequency float64) *SampleSet {
+func MakeSamples(rate, channels int, unit, volume, frequency float64) *SampleSet {
 	dot := make([]float64, int(math.Ceil(float64(rate)*unit)))
 	dash := make([]float64, int(math.Ceil(float64(rate)*unit*3)))
 	cp := make([]float64, int(math.Ceil(float64(rate)*unit)))
@@ -27,8 +27,8 @@ func MakeSamples(rate, channels int, unit, frequency float64) *SampleSet {
 
 	// Fill the dot and dash samples with a sine wave of
 	// adequate length and frequency.
-	makeSample(dot, rate, frequency)
-	makeSample(dash, rate, frequency)
+	makeSample(dot, rate, volume, frequency)
+	makeSample(dash, rate, volume, frequency)
 
 	// Convert amd return the float64 samples as 16-bit PCM audio.
 	return &SampleSet{
@@ -62,9 +62,11 @@ func toPCM(sample []float64, channels int) []uint16 {
 }
 
 // makeSample creates a constant tone for the given sample rate and frequency.
-func makeSample(samples []float64, rate int, frequency float64) {
+func makeSample(samples []float64, rate int, volume, frequency float64) {
 	for i := range samples {
-		samples[i] = math.Sin(2 * math.Pi * float64(i) / (float64(rate) / frequency))
+		samples[i] = math.Sin(
+			2 * math.Pi * float64(i) / (float64(rate) / frequency),
+		) * volume
 	}
 }
 

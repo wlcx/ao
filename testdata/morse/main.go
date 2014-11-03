@@ -18,6 +18,7 @@ type Config struct {
 	Note   string
 	Base   float64
 	Unit   float64
+	Volume uint
 }
 
 func main() {
@@ -29,7 +30,13 @@ func main() {
 
 	// Create morse code tones for the specified frequency.
 	frequency := Scale(cfg.Base, cfg.Note)
-	samples := MakeSamples(sf.Rate, sf.Channels, cfg.Unit, frequency)
+	samples := MakeSamples(
+		sf.Rate,
+		sf.Channels,
+		cfg.Unit,
+		float64(cfg.Volume)*0.01,
+		frequency,
+	)
 
 	// Convert the input text into a sequence of morse code audio samples.
 	morsecode := Translate(text, samples)
@@ -73,6 +80,7 @@ func parseArgs(sf *ao.SampleFormat, cfg *Config) string {
 	cfg.Unit = 0.05
 	cfg.Note = "F#"
 	cfg.Base = 440
+	cfg.Volume = 100
 
 	sf.ByteOrder = ao.EndianNative
 	sf.Matrix = ao.MatrixDefault
@@ -87,6 +95,7 @@ func parseArgs(sf *ao.SampleFormat, cfg *Config) string {
 	flag.StringVar(&cfg.Note, "n", cfg.Note, "Note to play at: C, C#, D, D#, E, F, F#, G, G#, A, A#, B")
 	flag.Float64Var(&cfg.Base, "f", cfg.Base, "Base frequency in herz for tone scale (value of note A).")
 	flag.Float64Var(&cfg.Unit, "u", cfg.Unit, "Duration of 1 unit (dot) in milliseconds.")
+	flag.UintVar(&cfg.Volume, "v", cfg.Volume, "Volume of output in range 0..100")
 
 	flag.Usage = func() {
 		fmt.Println("usage:", os.Args[0], "[options] <sentence>")
@@ -106,6 +115,10 @@ func parseArgs(sf *ao.SampleFormat, cfg *Config) string {
 
 	if cfg.Unit == 0 {
 		cfg.Unit = 0.1
+	}
+
+	if cfg.Volume > 100 {
+		cfg.Volume = 100
 	}
 
 	cfg.Note = strings.ToUpper(cfg.Note)
