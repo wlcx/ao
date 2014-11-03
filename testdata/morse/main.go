@@ -17,7 +17,7 @@ type Config struct {
 	Driver string
 	Note   string
 	Base   float64
-	Unit   float64
+	Unit   uint
 	Volume uint
 }
 
@@ -34,7 +34,7 @@ func main() {
 		sf.Rate,
 		sf.Channels,
 		cfg.Unit,
-		float64(cfg.Volume)*0.01,
+		cfg.Volume,
 		frequency,
 	)
 
@@ -77,7 +77,7 @@ func main() {
 // This function writes the appropriate errors to stderr and exits the
 // program when poop hits the fan.
 func parseArgs(sf *ao.SampleFormat, cfg *Config) string {
-	cfg.Unit = 0.05
+	cfg.Unit = 50
 	cfg.Note = "F#"
 	cfg.Base = 440
 	cfg.Volume = 100
@@ -94,7 +94,7 @@ func parseArgs(sf *ao.SampleFormat, cfg *Config) string {
 	flag.StringVar(&cfg.Driver, "d", cfg.Driver, "Name of audio driver to use. Empty value implies default system driver.")
 	flag.StringVar(&cfg.Note, "n", cfg.Note, "Note to play at: C, C#, D, D#, E, F, F#, G, G#, A, A#, B")
 	flag.Float64Var(&cfg.Base, "f", cfg.Base, "Base frequency in herz for tone scale (value of note A).")
-	flag.Float64Var(&cfg.Unit, "u", cfg.Unit, "Duration of 1 unit (dot) in milliseconds.")
+	flag.UintVar(&cfg.Unit, "u", cfg.Unit, "Duration of 1 unit (dot) in milliseconds.")
 	flag.UintVar(&cfg.Volume, "v", cfg.Volume, "Volume of output in range 0..100")
 
 	flag.Usage = func() {
@@ -114,7 +114,7 @@ func parseArgs(sf *ao.SampleFormat, cfg *Config) string {
 	}
 
 	if cfg.Unit == 0 {
-		cfg.Unit = 0.1
+		cfg.Unit = 10
 	}
 
 	if cfg.Volume > 100 {
