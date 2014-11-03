@@ -11,7 +11,7 @@ Any unknown character is reported through stderr and is otherwise ignored.
 
 ### Install
 
-	go get github.com/jteeuwen/ao/morse
+	go get github.com/jteeuwen/ao/testdata/morse
 
 
 ### Usage
