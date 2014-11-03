@@ -7,6 +7,7 @@ package ao
 import "C"
 import (
 	"errors"
+	"io"
 	"unsafe"
 )
 
@@ -26,14 +27,31 @@ func (d *Device) PlayU16(data []uint16) error {
 	return d.Play((*(*[1<<31 - 1]byte)(unsafe.Pointer(&data[0])))[:sz*2])
 }
 
+// Write writes at most len(p) bytes to the underlying device.
+func (d *Device) Write(p []byte) (n int, err error) {
+	if len(p) == 0 {
+		return 0, io.EOF
+	}
+
+	if C.ao_play(
+		d.ptr,
+		(*C.char)(unsafe.Pointer(&p[0])),
+		C.uint_32(len(p)),
+	) <= 0 {
+		return 0, errors.New("playback failed; device should be closed")
+	}
+
+	return len(p), nil
+}
+
 // Play plays a block of audio data to an open device. Samples are interleaved
 // by channels (Time 1, Channel 1; Time 1, Channel 2; Time 2, Channel 1; etc.)
 // in the memory buffer.
 //
 // Returns an error if playback failed. In which case, the device should
 // be closed.
-func (d *Device) Play(data []byte) error {
-	if len(data) == 0 {
+func (d *Device) Play(p []byte) error {
+	if len(p) == 0 {
 		return nil
 	}
 
@@ -43,8 +61,8 @@ func (d *Device) Play(data []byte) error {
 
 	if C.ao_play(
 		d.ptr,
-		(*C.char)(unsafe.Pointer(&data[0])),
-		C.uint_32(len(data)),
+		(*C.char)(unsafe.Pointer(&p[0])),
+		C.uint_32(len(p)),
 	) == 0 {
 		return errors.New("playback failed; device should be closed")
 	}
