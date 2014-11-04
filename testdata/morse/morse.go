@@ -33,7 +33,7 @@ func Translate(text string, samples *SampleSet) []uint16 {
 func translateWord(word string, s *SampleSet) []uint16 {
 	var out []uint16
 
-	for _, c := range word {
+	for i, c := range word {
 		switch c {
 		case 'a': // ._
 			out = append(out, s.Dot...)
@@ -339,7 +339,9 @@ func translateWord(word string, s *SampleSet) []uint16 {
 			fmt.Fprintf(os.Stderr, "unknown character: %c\n", c)
 		}
 
-		out = append(out, s.LetterPause...)
+		if i < len(word)-1 {
+			out = append(out, s.LetterPause...)
+		}
 	}
 
 	return out
