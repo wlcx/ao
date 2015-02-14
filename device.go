@@ -28,9 +28,18 @@ func (d *Device) PlayU16(data []uint16) error {
 }
 
 // Write writes at most len(p) bytes to the underlying device.
+// Samples are interleaved by channels (Time 1, Channel 1; Time 2, Channel 2;
+// Time 1, Channel 1; etc.) in the memory buffer.
+//
+// Returns an error if playback failed. In which case, the device should
+// be closed.
 func (d *Device) Write(p []byte) (n int, err error) {
 	if len(p) == 0 {
 		return 0, io.EOF
+	}
+
+	if d.ptr == nil {
+		return 0, errors.New("device is closed")
 	}
 
 	if C.ao_play(
@@ -44,30 +53,10 @@ func (d *Device) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-// Play plays a block of audio data to an open device. Samples are interleaved
-// by channels (Time 1, Channel 1; Time 1, Channel 2; Time 2, Channel 1; etc.)
-// in the memory buffer.
-//
-// Returns an error if playback failed. In which case, the device should
-// be closed.
+// Play is an alias for Device.Write(). Refer to its documentation for details.
 func (d *Device) Play(p []byte) error {
-	if len(p) == 0 {
-		return nil
-	}
-
-	if d.ptr == nil {
-		return errors.New("device is closed")
-	}
-
-	if C.ao_play(
-		d.ptr,
-		(*C.char)(unsafe.Pointer(&p[0])),
-		C.uint_32(len(p)),
-	) == 0 {
-		return errors.New("playback failed; device should be closed")
-	}
-
-	return nil
+	_, err := d.Write(p)
+	return err
 }
 
 // Close closes the audio device and frees the memory allocated
