@@ -143,7 +143,7 @@ func OpenLive(driver int, fmt *SampleFormat, options map[string]string) (*Device
 	defer freeOptions(coptions)
 
 	dev, err := C.ao_open_live(C.int(driver), fmt.toC(), coptions)
-	if err != nil {
+	if dev == nil {
 		return nil, err
 	}
 
