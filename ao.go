@@ -9,6 +9,7 @@ package ao
 // #include <ao/ao.h>
 import "C"
 import (
+	"errors"
 	"sync/atomic"
 	"unsafe"
 )
@@ -63,16 +64,26 @@ func Shutdown() {
 //
 // If no audio hardware is available, it is in use, or is not in the "standard"
 // configuration, this returns -1.
-func DefaultDriver() int { return int(C.ao_default_driver_id()) }
+func DefaultDriver() (id int, err error) {
+	id = int(C.ao_default_driver_id())
+	if id == -1 {
+		err = errors.New("No default driver found")
+	}
+	return
+}
 
 // DriverByName attempts to fetch the id for the given driver.
 // Refer to https://xiph.org/ao/doc/drivers.html for a list of supported
 // driver names.
 //
 // Returns -1 if no matching driver was found.
-func DriverByName(name string) int {
+func DriverByName(name string) (id int, err error) {
 	cname := C.CString(name)
 	v := C.ao_driver_id(cname)
 	C.free(unsafe.Pointer(cname))
-	return int(v)
+	id = int(v)
+	if id == -1 {
+		err = errors.New("No matching driver found")
+	}
+	return
 }
